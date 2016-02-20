@@ -11,7 +11,7 @@ The input files for a BLAST job include:
 * one or more genetic database files
 * database index files
 
-In this exercise, the database is contained in a single 1.3 GB file, and the query is divided into 2 files of approximately 7.5 MB each (small enough to use the HT Condor file transfer mechanism). Each query must be compared to the database file using BLAST, so 2 jobs are needed in this workflow.  If BLAST jobs have an excessively long run time, it is also possible to subdivide the database file to shorten job duration and increase the total number of jobs required. 
+In this exercise, the database is contained in a single 1.3 GB file, and the query is divided into 2 files of approximately 7.5 MB each (small enough to use the HTCondor file transfer mechanism, though files with longer reads may need to be divided into even smaller files, as blast can take much longer for longer reads). Each query must be compared to the database file using BLAST, so 2 jobs are needed in this workflow.  If BLAST jobs have an excessively long run time, it is also possible to subdivide the database file to shorten job duration and increase the total number of jobs required. 
 
 Even when subdivided into smaller segments for use in a High Throughput Computing environment, the database files can still be quite large.  Due to its size (1.3 GB) and the fact that it is used for multiple jobs, the database file and corresponding index files will be transferred to the compute sites using StashCache, which takes advantage of proxy caching to improve transfer speed and efficiency.  Learn more about StashCache and basic usage instructions [here](https://support.opensciencegrid.org/solution/articles/12000002775-introduction-to-stashcache).
 
@@ -24,7 +24,7 @@ Even when subdivided into smaller segments for use in a High Throughput Computin
 
 2) The tutorial-stashcache-blast directory contains a number of files, described below:
 
-* HT Condor submit script: **blast.submit**
+* HTCondor submit script: **blast.submit**
 * Job wrapper script: **blast_wrapper.sh**
 * Query files: **query_0.fa  query_1.fa**
 
@@ -35,7 +35,7 @@ In addition to these files, the following input files are needed for the jobs:
 These files are currently being stored in */stash2/user/eharstad/public/blast_database/*.  In step 3 (below), you will copy them into your own stash directory before submitting the job. 
 
 ***
-First, let's take a look a the HT Condor job submission script:
+First, let's take a look a the HTCondor job submission script:
 
 	$ cat blast.submit
 
@@ -57,7 +57,7 @@ First, let's take a look a the HT Condor job submission script:
  
      	queue 2
 
-The executable for this job is a wrapper script (*blast_wrapper.sh*) that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HT Condor) to each job site with the *transfer_input_files* command.  This job also requires OASIS, and at lest 2 GB of disk space for input files, which we specify with the *requirements* and *request_disk* commands.  
+The executable for this job is a wrapper script (*blast_wrapper.sh*) that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HTCondor) to each job site with the *transfer_input_files* command.  This job also requires OASIS, and at lest 2 GB of disk space for input files, which we specify with the *requirements* and *request_disk* commands.  
 
 Note the one additional line that is required in the submit script of any job that uses StashCache:
 
