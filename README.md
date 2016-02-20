@@ -96,6 +96,8 @@ On the osgconnect login node:
 
 	$ cp -r /stash2/user/eharstad/public/blast_database ~/stash/.
 
+This may take a few minutes to complete since the database file is so large.
+
 4) Open up blast_wrapper.sh with a text editor, and edit the line with the stashcp command by replacing 'userid' with your actual OSG Connect userid. 
 
 Edit this line:
