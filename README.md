@@ -3,7 +3,7 @@
  
 ## Overview
 
-This tutorial will use a [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastHome) workflow to demonstrate the functionality of StashCache for transferring input files to active jobs.  BLAST (Basic Local Alignment Search Tool) is an open-source bioinformatics tool developed by the NCBI that searches for alignments between query sequences and a genetic database. 
+This tutorial will use a [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastHome) workflow to demonstrate the functionality of StashCache for transferring input files to active job sites.  BLAST (Basic Local Alignment Search Tool) is an open-source bioinformatics tool developed by the NCBI that searches for alignments between query sequences and a genetic database. 
 
 The input files for a BLAST job include:
 
@@ -11,9 +11,9 @@ The input files for a BLAST job include:
 * genetic database file
 * database index files
 
-In this exercise, the database is contained in a single 1.3 GB file, and the query is divided into 2 files of approximately 7.5 MB each (small enough to use the HTCondor file transfer mechanism, though files with longer reads may need to be divided into even smaller files, as blast can take much longer for longer reads). Each query must be compared to the database file using BLAST, so 2 jobs are needed in this workflow.  If BLAST jobs have an excessively long run time, it is also possible to subdivide the database file to shorten job duration and increase the total number of jobs required (however, an additional step for normalizing the final merged results is also required). 
+In this exercise, the database is contained in a single 1.3 GB file, and the query is divided into 2 files of approximately 7.5 MB each (small enough to use the HTCondor file transfer mechanism). Each query must be compared to the database file using BLAST, so 2 jobs are needed in this workflow.  If BLAST jobs have an excessively long run time, the query files can be further subdivided into smaller segments.
 
-Even when subdivided into smaller segments for use in a High Throughput Computing environment, the database files can still be quite large.  Due to its size (1.3 GB) and the fact that it is used for multiple jobs, the database file and corresponding index files will be transferred to the compute sites using StashCache, which takes advantage of proxy caching to improve transfer speed and efficiency.  Learn more about StashCache and basic usage instructions [here](https://support.opensciencegrid.org/solution/articles/12000002775-introduction-to-stashcache).
+Usually, the database files used with BLAST are quite large.  Due to its size (1.3 GB) and the fact that it is used for multiple jobs, the database file and corresponding index files will be transferred to the compute sites using StashCache, which takes advantage of proxy caching to improve transfer speed and efficiency.  Learn more about StashCache and basic usage instructions [here](https://support.opensciencegrid.org/solution/articles/12000002775-introduction-to-stashcache).
 
 ## Tutorial Instructions
 
@@ -35,7 +35,7 @@ In addition to these files, the following input files are needed for the jobs:
 These files are currently being stored in */stash2/user/eharstad/public/blast_database/*.  In step 3 (below), you will copy them into your own stash directory before submitting the job. 
 
 ***
-First, let's take a look a the HTCondor job submission script:
+First, let's take a look at the HTCondor job submission script:
 
 	$ cat blast.submit
 
@@ -90,7 +90,7 @@ The stashcp tool is used to copy the directory containing our blast database and
 
 Finally, we cd into the directory containing the Blast database and execute the Blast command that is read into this script as a list of arguments (provided in the submit script).  
 
-3)  Stashcp copies database files from your stash storage space to the compute site where your job runs.  Therefore, before submitting these jobs, you must copy the database files from their currently location into your own stash directory:
+3)  Stashcp copies database files from your stash storage space to the compute site where your job runs.  Therefore, before submitting these jobs, you must copy the database files from their current location into your own stash directory:
 
 On the osgconnect login node:
 
