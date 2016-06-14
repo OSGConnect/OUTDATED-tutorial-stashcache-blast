@@ -32,85 +32,55 @@ In addition to these files, the following input files are needed for the jobs:
 * database file: **nt.fa**
 * database index files: **nt.fa.nhr  nt.fa.nin  nt.fa.nsq**
 
-These files are currently being stored in */stash2/user/eharstad/public/blast_database/*.  In step 3 (below), you will copy them into your own stash directory before submitting the job. 
+These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/`.
 
 ***
 First, let's take a look at the HTCondor job submission script:
 
 	$ cat blast.submit
+	universe = vanilla
+	
+	executable = blast_wrapper.sh
+	arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/nt.fa -query $(queryfile)
+	should_transfer_files = YES
+	when_to_transfer_output = ON_EXIT
+	transfer_input_files = $(queryfile)
+	
+	+WantsCvmfsStash = true
+	requirements = (GLIDEIN_ResourceName == "MWT2" || GLIDEIN_ResourceName == "Nebraska" || GLIDEIN_ResourceName ==  "Sandhills")
+	
+	output = job.out.$(Cluster).$(Process)
+	error = job.err.$(Cluster).$(Process)
+	log = job.log.$(Cluster).$(Process)
+	
+	# For each file matching query*.fa, submit a job
+	queue queryfile matching query*.fa
 
-     	universe = vanilla
-
-     	executable = blast_wrapper.sh
-     	arguments  = blastn -db nt.fa -query ../query_$(Process).fa
-     	should_transfer_files = YES
-     	when_to_transfer_output = ON_EXIT
-     	transfer_input_files = query_$(Process).fa
-
-     	requirements = (CVMFS_oasis_opensciencegrid_org_REVISION >= 3600) && (OpSysMajorVer == 6)
-     	request_disk = 2G
-     	+WantsStashCache = true
-
-     	output = job.out.$(Cluster).$(Process)
-     	error = job.err.$(Cluster).$(Process)
-     	log = job.log.$(Cluster).$(Process)
- 
-     	queue 2
-
-The executable for this job is a wrapper script (*blast_wrapper.sh*) that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HTCondor) to each job site with the *transfer_input_files* command.  This job also requires OASIS, and at least 2 GB of disk space for input files, which we specify with the *requirements* and *request_disk* commands.  
+The executable for this job is a wrapper script, `blast_wrapper.sh`, that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HTCondor) to each job site with the *transfer_input_files* command.
 
 Note the one additional line that is required in the submit script of any job that uses StashCache:
 
-	+WantsStashCache = true
+	+WantsCvmfsStash = true
 
-Finally, since there are 2 query files we queue 2 jobs with the *queue 2* command.  Because we have used the $(Process) macro in the name of the query input files, only one query file will be transferred to each job.
+Finally, since there are multiple query files, we submit them with the command `queue queryfile matching query*.fa` command.  Because we have used the $(queryfile) macro in the name of the query input files, only one query file will be transferred to each job.
 
 ***
 Now, let's take a look at the job wrapper script which is the job's executable:
 
 	$ cat blast_wrapper.sh
-
 	#!/bin/bash
-     	source /cvmfs/oasis.opensciencegrid.org/osg/modules/lmod/5.6.2/init/bash
-     	module load blast
-     	module load stashcp
+	# Load the blast module
+	module load blast
+	
+	"$@"
 
-     	stashcp -r -s user/userid/blast_database -l .
-     	cd blast_database
+The wrapper script loads the blast modules so that it can access the Blast software on the compute host.
 
-     	"$@"
-
-We first source the initialization script for the OASIS modules.  Next, the wrapper script loads the blast and stashcp modules so that it can access the software on the compute host.
-
-The stashcp tool is used to copy the directory containing our blast database and index files from stash to the current working directory on the host:
-     
-	stashcp -r -s user/userid/blast_database -l .
-
-(For more information on using StashCache and stashcp, see [Introduction to StashCache](https://support.opensciencegrid.org/solution/articles/12000002775-introduction-to-stashcache).)
-
-Finally, we cd into the directory containing the Blast database and execute the Blast command that is read into this script as a list of arguments (provided in the submit script).  
-
-3)  Stashcp copies database files from your stash storage space to the compute site where your job runs.  Therefore, before submitting these jobs, you must copy the database files from their current location into your own stash directory:
-
-On the osgconnect login node:
-
-	$ cp -r /stash2/user/eharstad/public/blast_database ~/stash/.
-
-This may take a few minutes to complete since the database file is so large.
-
-4) Open up blast_wrapper.sh with a text editor, and edit the line with the stashcp command by replacing 'userid' with your actual OSG Connect userid. 
-
-Edit this line:
-
-	stashcp -r -s user/userid/data -l . 
-
-Save your changes and close the file. 
-
-4) You are now ready to submit the jobs:
+You are now ready to submit the jobs:
 
 	$ condor_submit blast.submit
 
-5) Each job should run for approximately 3-5 minutes.  You can monitor the jobs with the condor_q command:
+ Each job should run for approximately 3-5 minutes.  You can monitor the jobs with the condor_q command:
 
 	$ condor_q <userid>
 
