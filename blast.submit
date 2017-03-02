@@ -7,10 +7,11 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files = $(queryfile)
 
 +WantsCvmfsStash = true
-requirements = (GLIDEIN_ResourceName == "MWT2" || GLIDEIN_ResourceName == "Nebraska" || GLIDEIN_ResourceName ==  "Sandhills")
+requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
 
 output = job.out.$(Cluster).$(Process)
 error = job.err.$(Cluster).$(Process)
 log = job.log.$(Cluster).$(Process)
 
 queue queryfile matching query*.fa
+
