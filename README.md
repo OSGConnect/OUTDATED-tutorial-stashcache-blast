@@ -47,7 +47,7 @@ First, let's take a look at the HTCondor job submission script:
 	transfer_input_files = $(queryfile)
 	
 	+WantsCvmfsStash = true
-	requirements = (GLIDEIN_ResourceName == "MWT2" || GLIDEIN_ResourceName == "Nebraska" || GLIDEIN_ResourceName ==  "Sandhills")
+    requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True
 	
 	output = job.out.$(Cluster).$(Process)
 	error = job.err.$(Cluster).$(Process)
@@ -71,6 +71,8 @@ Now, let's take a look at the job wrapper script which is the job's executable:
 	#!/bin/bash
 	# Load the blast module
 	module load blast
+
+    set -e
 	
 	"$@"
 
