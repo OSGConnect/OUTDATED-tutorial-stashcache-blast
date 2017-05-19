@@ -7,11 +7,17 @@ when_to_transfer_output = ON_EXIT
 transfer_input_files = $(queryfile)
 
 +WantsCvmfsStash = true
-requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True
+requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True && OSG_GLIDEIN_VERSION >= 203
 
 output = job.out.$(Cluster).$(Process)
 error = job.err.$(Cluster).$(Process)
 log = job.log.$(Cluster).$(Process)
+
+# Send the job to Held state on failure. 
+on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
+
+# Periodically retry the jobs
+periodic_release = (NumJobStarts < 5)
 
 queue queryfile matching query*.fa
 
