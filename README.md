@@ -32,7 +32,7 @@ In addition to these files, the following input files are needed for the jobs:
 * database file: **nt.fa**
 * database index files: **nt.fa.nhr  nt.fa.nin  nt.fa.nsq**
 
-These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/`.
+These files are currently being stored in `/cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/`.  Please note that these database files are for demo purposes only!!!!!  They have not been updated and should not be used to run actual analyses.
 
 ***
 First, let's take a look at the HTCondor job submission script:
@@ -41,7 +41,7 @@ First, let's take a look at the HTCondor job submission script:
 	universe = vanilla
 	
 	executable = blast_wrapper.sh
-	arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/nt.fa -query $(queryfile)
+	arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/nt.fa -query $(queryfile)
 	should_transfer_files = YES
 	when_to_transfer_output = ON_EXIT
 	transfer_input_files = $(queryfile)
