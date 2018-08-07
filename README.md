@@ -46,7 +46,6 @@ First, let's take a look at the HTCondor job submission script:
 	when_to_transfer_output = ON_EXIT
 	transfer_input_files = $(queryfile)
 	
-	+WantsCvmfsStash = true
     requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True
 	
 	output = job.out.$(Cluster).$(Process)
@@ -57,10 +56,6 @@ First, let's take a look at the HTCondor job submission script:
 	queue queryfile matching query*.fa
 
 The executable for this job is a wrapper script, `blast_wrapper.sh`, that takes as arguments the blast command that we want to run on the compute host.  We specify which query file we want transferred (using HTCondor) to each job site with the *transfer_input_files* command.
-
-Note the one additional line that is required in the submit script of any job that uses StashCache:
-
-	+WantsCvmfsStash = true
 
 Finally, since there are multiple query files, we submit them with the command `queue queryfile matching query*.fa` command.  Because we have used the $(queryfile) macro in the name of the query input files, only one query file will be transferred to each job.
 

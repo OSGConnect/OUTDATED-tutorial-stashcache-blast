@@ -1,13 +1,12 @@
 universe = vanilla
 
 executable = blast_wrapper.sh
-arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database/nt.fa -query $(queryfile)
+arguments  = blastn -db /cvmfs/stash.osgstorage.org/user/eharstad/public/blast_database_old/nt.fa -query $(queryfile)
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
 transfer_input_files = $(queryfile)
 
-+WantsCvmfsStash = true
-requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True && OSG_GLIDEIN_VERSION >= 203
+requirements = OSGVO_OS_STRING == "RHEL 6" && Arch == "X86_64" && HAS_MODULES == True && HAS_CVMFS_stash_osgstorage_org == True
 
 output = job.out.$(Cluster).$(Process)
 error = job.err.$(Cluster).$(Process)
